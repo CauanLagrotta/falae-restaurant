@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import Visibility from "@mui/icons-material/Visibility";
@@ -6,6 +6,12 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Axios from "axios";
+
+interface FormValues {
+  email: string;
+  password: string;
+}
 
 const validationSchema = Yup.object({
   email: Yup.string().email("Email inválido").required("Email é obrigatório"),
@@ -17,14 +23,57 @@ const validationSchema = Yup.object({
 export function Login() {
   const [showPassword, setShowPassword] = useState(false);
 
+  const navigate = useNavigate();
+
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
+  };
+
+  const handleClickLogin = (
+    values: FormValues,
+    { resetForm }: { resetForm: () => void }
+  ) => {
+    Axios.post("http://localhost:3000/api/auth/login", {
+      useremail: values.email,
+      userpassword: values.password,
+    })
+      .then((res) => {
+        if (res.data.msg === "Login efetuado com sucesso") {
+          toast.success("Login realizado com sucesso!", {
+            position: "bottom-left",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: false,
+            progress: undefined,
+          });
+          setTimeout(() => navigate("/"), 1000);
+          resetForm();
+        }
+      })
+      .catch(() => {
+        toast.error("Email ou senha inválidos", {
+          icon: false,
+          position: "bottom-left",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: false,
+          progress: undefined,
+        });
+      });
   };
 
   return (
     <div className="w-full h-screen flex flex-col sm:flex-row items-center justify-center bg-gray-100">
       <div className="hidden sm:flex w-full sm:w-[50%] justify-center items-center mb-8 sm:mb-0">
-        <img className="w-[80%] sm:w-full" src="./login.svg" alt="Imagem da tela de login" />
+        <img
+          className="w-[80%] sm:w-full"
+          src="./login.svg"
+          alt="Imagem da tela de login"
+        />
       </div>
 
       <div className="flex w-[90%] sm:w-[50%] max-w-3xl bg-white p-8 rounded-lg shadow-md">
@@ -34,15 +83,15 @@ export function Login() {
           <Formik
             initialValues={{ email: "", password: "" }}
             validationSchema={validationSchema}
-            onSubmit={async (values) => {
-              console.log(values);
-              toast.success("Login realizado com sucesso!");
-            }}
+            onSubmit={handleClickLogin}
           >
             {({ errors, touched }) => (
               <Form className="space-y-4">
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-600">
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-medium text-gray-600"
+                  >
                     Email
                   </label>
                   <Field
@@ -50,7 +99,9 @@ export function Login() {
                     name="email"
                     placeholder="Digite seu email..."
                     className={`w-full px-4 py-2 mt-2 border rounded-md ${
-                      errors.email && touched.email ? "border-red-500" : "border-gray-300"
+                      errors.email && touched.email
+                        ? "border-red-500"
+                        : "border-gray-300"
                     }`}
                   />
                   {errors.email && touched.email && (
@@ -60,7 +111,10 @@ export function Login() {
 
                 <div className="relative">
                   <div className="flex justify-between items-center">
-                    <label htmlFor="password" className="text-sm font-medium text-gray-600">
+                    <label
+                      htmlFor="password"
+                      className="text-sm font-medium text-gray-600"
+                    >
                       Senha
                     </label>
                     <div
@@ -75,11 +129,15 @@ export function Login() {
                     name="password"
                     placeholder="Digite sua senha..."
                     className={`w-full px-4 py-2 mt-2 border rounded-md ${
-                      errors.password && touched.password ? "border-red-500" : "border-gray-300"
+                      errors.password && touched.password
+                        ? "border-red-500"
+                        : "border-gray-300"
                     }`}
                   />
                   {errors.password && touched.password && (
-                    <div className="text-red-500 text-sm">{errors.password}</div>
+                    <div className="text-red-500 text-sm">
+                      {errors.password}
+                    </div>
                   )}
                 </div>
 
@@ -100,7 +158,7 @@ export function Login() {
         </div>
       </div>
 
-      <ToastContainer position="top-center" autoClose={5000} hideProgressBar />
+      <ToastContainer />
     </div>
   );
 }

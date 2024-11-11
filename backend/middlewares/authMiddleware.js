@@ -1,3 +1,8 @@
+import jwt from "jsonwebtoken";
+import db from "../db/db.js";
+import dotenv from "dotenv";
+dotenv.config();
+
 export const verifyUser = (req, res, next) => {
     const token = req.cookies.token;
     
