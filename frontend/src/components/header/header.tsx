@@ -2,10 +2,13 @@ import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Logout from "@mui/icons-material/Logout";
 import Axios from "axios";
+import { HeaderProps } from "@/types/types";
 
-export function Header() {
+export function Header({
+  onStaffStatus,
+  staff,
+}: HeaderProps & { staff: number }) {
   const [auth, setAuth] = useState(false);
-  const [staff, setStaff] = useState(0);
 
   Axios.defaults.withCredentials = true;
 
@@ -14,13 +17,14 @@ export function Header() {
       .then((res) => {
         if (res.data.msg === "Autenticação bem-sucedida") {
           setAuth(true);
-          setStaff(res.data.user.staff);
+          onStaffStatus(res.data.user.staff);
         } else {
           setAuth(false);
+          onStaffStatus(0);
         }
       })
       .catch((err) => console.log(err));
-  }, []);
+  }, [onStaffStatus]);
 
   const handleLogout = () => {
     Axios.get("http://localhost:3000/api/auth/logout").then(() => {
@@ -36,17 +40,25 @@ export function Header() {
             <Link to="/">Home</Link>
           </li>
 
-          {staff === 1 && (
+          {auth && staff === 1 && (
             <li className="border border-blue-600 p-2 sm:p-3 md:p-4 lg:p-5 rounded-[50px]">
               <Link to="/orders">Pedidos</Link>
             </li>
           )}
 
+          {auth && staff === 0 && (
+            <li className="border border-blue-600 p-2 sm:p-3 md:p-4 lg:p-5 rounded-[50px]">
+              <Link to="/myorders">Meus pedidos</Link>
+            </li>
+          )}
+
           {auth ? (
-            <Logout
-              className="text-blue-600 w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16"
-              onClick={handleLogout}
-            />
+            <>
+              <Logout
+                className="text-blue-600 cursor-pointer w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16"
+                onClick={handleLogout}
+              />
+            </>
           ) : (
             <>
               <li className="border border-blue-600 p-2 sm:p-3 md:p-4 lg:p-5 rounded-[50px]">
