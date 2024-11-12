@@ -14,7 +14,7 @@ export function Router() {
             <Route path="/register" element={<Register />} />
             <Route path="/orders" element={<Orders />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/api/auth/reset-password/:userid/:token" element={<ResetPassword />} />
         </Routes>
     )
 }

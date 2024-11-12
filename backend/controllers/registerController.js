@@ -37,7 +37,7 @@ registerController.post("/", (req, res) => {
           );
         });
       } else {
-        res.status(400).send({ msg: "Email ou nome já existem" });
+        res.status(400).send({ msg: "Email, nome ou telefone já existem" });
       }
     }
   );

@@ -45,7 +45,7 @@ db.serialize(() => {
           useraddress TEXT NOT NULL,
           orderstatus TEXT NOT NULL DEFAULT 'Pendente',
           createdAt TEXT DEFAULT (datetime('now', 'localtime')),
-          FOREIGN KEY (userId) REFERENCES User(id)
+          FOREIGN KEY (userId) REFERENCES users(id)
         );
       `);
 
