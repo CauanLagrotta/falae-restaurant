@@ -6,7 +6,7 @@ const saltRounds = 10;
 const registerController = express.Router();
 
 registerController.post("/", (req, res) => {
-  const { username, useremail, userphone, userpassword } = req.body;
+  const { username, useremail, userphone, userpassword, useraddress } = req.body;
   const defaultStaffValue = 0;
 
   db.get(
@@ -25,8 +25,8 @@ registerController.post("/", (req, res) => {
           }
 
           db.run(
-            "INSERT INTO users (username, useremail, userphone, userpassword, staff) VALUES (?, ?, ?, ?, ?)",
-            [username, useremail, userphone, hash, defaultStaffValue],
+            "INSERT INTO users (username, useremail, userphone, userpassword, useraddress, staff) VALUES (?, ?, ?, ?, ?, ?)",
+            [username, useremail, userphone, hash, useraddress, defaultStaffValue],
             (err) => {
               if (err) {
                 console.error("Erro ao cadastrar usuário:", err);

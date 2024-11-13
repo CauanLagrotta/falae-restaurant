@@ -13,6 +13,7 @@ interface FormValues {
   name: string;
   email: string;
   phone: string;
+  address: string;
   password: string;
   confirmPassword: string;
 }
@@ -21,6 +22,7 @@ const validationSchema = Yup.object({
   name: Yup.string().required("Nome é obrigatório"),
   email: Yup.string().email("Email inválido").required("Email é obrigatório"),
   phone: Yup.string().required("Telefone é obrigatório"),
+  address: Yup.string().required("Endereço é obrigatório"),
   password: Yup.string()
     .min(6, "A senha precisa ter no mínimo 6 caracteres")
     .required("Senha é obrigatória"),
@@ -47,6 +49,7 @@ export function Register() {
       username: values.name,
       useremail: values.email,
       userphone: values.phone,
+      useraddress: values.address, 
       userpassword: values.password,
     })
       .then((res) => {
@@ -93,20 +96,18 @@ export function Register() {
 
       <div className="flex w-[90%] sm:w-[50%] max-w-3xl bg-white p-8 rounded-lg shadow-md">
         <div className="w-full px-6 flex flex-col justify-center">
-          <h2 className="text-2xl font-semibold mb-4 text-center">
-            Registrar-se
-          </h2>
 
           <Formik
             initialValues={{
               name: "",
               email: "",
               phone: "",
+              address: "",
               password: "",
               confirmPassword: "",
             }}
             validationSchema={validationSchema}
-            onSubmit={handleClickRegister} 
+            onSubmit={handleClickRegister}
           >
             {({ errors, touched }) => (
               <Form className="space-y-4">
@@ -177,6 +178,28 @@ export function Register() {
                   </Field>
                   {errors.phone && touched.phone && (
                     <div className="text-red-500 text-sm">{errors.phone}</div>
+                  )}
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="address"
+                    className="block text-sm font-medium text-gray-600"
+                  >
+                    Endereço
+                  </label>
+                  <Field
+                    type="text"
+                    name="address"
+                    placeholder="Digite seu endereço completo..."
+                    className={`w-full px-4 py-2 mt-2 border rounded-md ${
+                      errors.address && touched.address
+                        ? "border-red-500"
+                        : "border-gray-300"
+                    }`}
+                  />
+                  {errors.address && touched.address && (
+                    <div className="text-red-500 text-sm">{errors.address}</div>
                   )}
                 </div>
 
@@ -265,7 +288,6 @@ export function Register() {
           </Formik>
         </div>
       </div>
-
       <ToastContainer />
     </div>
   );

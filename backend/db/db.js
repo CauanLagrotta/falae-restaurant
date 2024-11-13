@@ -22,7 +22,8 @@ db.serialize(() => {
           useremail TEXT NOT NULL UNIQUE,
           userphone TEXT NOT NULL UNIQUE,
           userpassword TEXT NOT NULL,
-          staff INTEGER DEFAULT 0
+          staff INTEGER DEFAULT 0,
+          useraddress TEXT NOT NULL
         );
       `);
 
@@ -42,7 +43,6 @@ db.serialize(() => {
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           userId INTEGER NOT NULL,
           totalPrice REAL NOT NULL DEFAULT 0,
-          useraddress TEXT NOT NULL,
           orderstatus TEXT NOT NULL DEFAULT 'Pendente',
           createdAt TEXT DEFAULT (datetime('now', 'localtime')),
           FOREIGN KEY (userId) REFERENCES users(id)
