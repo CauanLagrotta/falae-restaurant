@@ -1,50 +1,67 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Header } from "../../components/header/header";
 import { AddProductModal } from "../../components/addProductModal/addProductModal";
 import { EditProductModal } from "../../components/editProductModal/editProductModal";
 import { Product } from "@/types/types";
 import { LearnMore } from "../../components/learnMore/learnMore";
+import Axios from "axios";
 
 export function Home() {
-  const [isAddProductModalOpen, setIsAddProductModalOpen] = useState<boolean>(false);
-  const [isEditProductModalOpen, setIsEditProductModalOpen] = useState<boolean>(false);
+  const [isAddProductModalOpen, setIsAddProductModalOpen] =
+    useState<boolean>(false);
+  const [isEditProductModalOpen, setIsEditProductModalOpen] =
+    useState<boolean>(false);
   const [isLearnMoreOpen, setIsLearnMoreOpen] = useState<boolean>(false);
-  const [products, setProducts] = useState<Product[]>([
-    {
-      id: 1,
-      name: "Prato 1",
-      price: "R$ 30,00",
-      description: "Descrição detalhada do prato 1.",
-      imageUrl:
-        "https://i.pinimg.com/736x/d3/4d/0d/d34d0d692b8741172fe723669c9ab8de.jpg",
-      category: "Prato principal",
-    },
-    {
-      id: 2,
-      name: "Prato 2",
-      price: "R$ 25,00",
-      description: "Descrição detalhada do prato 2.",
-      imageUrl:
-        "https://static.itdg.com.br/images/1200-630/4dfadc46568f5db05a8e4abd94cfeeb6/shutterstock-561846814.jpg",
-      category: "Prato principal",
-    },
-  ]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [staff, setStaff] = useState<number>(0);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
-  const openAddProductModal = () => {
-    setIsAddProductModalOpen(true);
+
+  const filteredProducts = products.filter((product) => {
+    if (selectedCategory === "all") {
+      return true;
+    }
+    return product.productcategory === selectedCategory;
+  });
+
+  const handleCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedCategory(event.target.value);
+  };
+  
+  const fetchProducts = async () => {
+    try {
+      const res = await Axios.get("http://localhost:3000/api/products");
+      setProducts(res.data);
+    } catch (error) {
+      console.log("Erro ao buscar produtos:", error);
+    }
   };
 
-  const closeAddProductModal = () => {
-    setIsAddProductModalOpen(false);
+  const handleDeleteProduct = async (id: number) => {
+    try {
+      await Axios.delete(`http://localhost:3000/api/products/${id}`).then(() =>{
+        Axios.get("http://localhost:3000/api/products").then((res) => {
+          setProducts(res.data);
+        })
+      })
+      fetchProducts();
+    } catch (error) {
+      console.log("Erro ao excluir o produto:", error);
+    }
   };
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const openAddProductModal = () => setIsAddProductModalOpen(true);
+  const closeAddProductModal = () => setIsAddProductModalOpen(false);
 
   const openEditProductModal = (product: Product) => {
     setSelectedProduct(product);
     setIsEditProductModalOpen(true);
   };
-
   const closeEditProductModal = () => {
     setIsEditProductModalOpen(false);
     setSelectedProduct(null);
@@ -54,22 +71,19 @@ export function Home() {
     setSelectedProduct(product);
     setIsLearnMoreOpen(true);
   };
-
   const closeLearnMoreModal = () => {
     setIsLearnMoreOpen(false);
     setSelectedProduct(null);
   };
 
-  const handleAddProduct = (product: { name: string; price: string; category: string }) => {
-    const newProduct: Product = {
-      id: products.length + 1,
-      name: product.name,
-      price: product.price,
-      description: "Descrição do novo produto.",
-      imageUrl: "",
-      category: product.category,
-    };
-    setProducts([...products, newProduct]);
+  const handleProductAdded = () => {
+    closeAddProductModal();
+    fetchProducts();
+  };
+
+  const handleProductEdited = () => {
+    closeEditProductModal();
+    fetchProducts();
   };
 
   return (
@@ -78,11 +92,12 @@ export function Home() {
 
       <div className="flex justify-between bg-gray-100 p-4">
         <h2 className="text-2xl font-semibold">Cardápio</h2>
-
         <div>
           <select
             className="border text-white bg-blue-600 border-gray-300 rounded-md p-2"
             name="products"
+            onChange={handleCategoryChange}
+            value={selectedCategory}
           >
             <option className="bg-white text-black" disabled selected>
               Selecionar tipo de refeição
@@ -90,19 +105,19 @@ export function Home() {
             <option className="bg-white text-black" value="all">
               Todos
             </option>
-            <option className="bg-white text-black" value="starters">
+            <option className="bg-white text-black" value="entradas">
               Entradas
             </option>
-            <option className="bg-white text-black" value="sides">
+            <option className="bg-white text-black" value="pratos-principais">
+              Pratos Principais
+            </option>
+            <option className="bg-white text-black" value="acompanhamentos">
               Acompanhamentos
             </option>
-            <option className="bg-white text-black" value="drinks">
+            <option className="bg-white text-black" value="bebidas">
               Bebidas
             </option>
-            <option className="bg-white text-black" value="meals">
-              Pratos principais
-            </option>
-            <option className="bg-white text-black" value="desserts">
+            <option className="bg-white text-black" value="sobremesas">
               Sobremesas
             </option>
           </select>
@@ -119,20 +134,21 @@ export function Home() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
-        {products.map((product) => (
+        {filteredProducts.map((product) => (
           <div key={product.id} className="bg-white p-4 rounded-lg shadow-md">
             <img
-              src={product.imageUrl}
-              alt={product.name}
+              src={product.productImageUrl}
+              alt={product.productname}
               className="w-full h-48 object-cover rounded-md"
             />
             <div>
-              <h3 className="text-lg font-semibold mt-2">{product.name}</h3>
-              <p className="text-sm text-gray-600">{product.price}</p>
-              <p className="text-sm text-gray-600">{product.category}</p>
+              <h3 className="text-lg font-semibold mt-2">{product.productname}</h3>
+              <p className="text-sm text-gray-600">
+                R$ {product.productprice}
+              </p>
+              <p className="text-sm text-gray-600">{product.productcategory.replace("-", " ")}</p>
             </div>
 
-            
             <div className="flex justify-end mt-2">
               {staff === 1 && (
                 <>
@@ -142,7 +158,7 @@ export function Home() {
                   >
                     Editar
                   </button>
-                  <button className="bg-red-600 text-white px-4 py-2 rounded-lg">
+                  <button onClick={() => handleDeleteProduct(product.id)} className="bg-red-600 text-white px-4 py-2 rounded-lg">
                     Excluir
                   </button>
                 </>
@@ -157,9 +173,11 @@ export function Home() {
                 Saiba Mais
               </button>
 
-              <button className="bg-green-700 text-white px-4 py-2 rounded-lg">
-                Adicionar ao Carrinho
-              </button>
+              { staff === 0 &&
+                <button className="bg-green-700 text-white px-4 py-2 rounded-lg">
+                  Adicionar ao Carrinho
+                </button>
+              }
             </div>
           </div>
         ))}
@@ -167,14 +185,14 @@ export function Home() {
 
       <AddProductModal
         isOpen={isAddProductModalOpen}
-        onClose={closeAddProductModal}
-        onAddProduct={handleAddProduct}
+        onClose={handleProductAdded}
+        onAddProduct={handleProductAdded}
       />
-
       <EditProductModal
         isOpen={isEditProductModalOpen}
-        onClose={closeEditProductModal}
-        onAddProduct={handleAddProduct}
+        onClose={handleProductEdited}
+        selectedProduct={selectedProduct}
+        onAddProduct={handleProductEdited}
       />
 
       {selectedProduct && (

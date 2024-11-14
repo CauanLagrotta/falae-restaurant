@@ -10,12 +10,12 @@ export function LearnMore({
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white p-6 rounded-lg max-w-lg w-full">
-        <h3 className="text-xl font-semibold">{selectedProduct.name}</h3>
+        <h3 className="text-xl font-semibold">{selectedProduct.productname}</h3>
         <p className="text-sm text-gray-600 mt-2">
-          {selectedProduct.description}
+          {selectedProduct.productdescription}
         </p>
-        <p className="text-lg font-semibold mt-4">{selectedProduct.price}</p>
-        <p className="text-sm text-gray-600 mt-2">{selectedProduct.category}</p>
+        <p className="text-lg font-semibold mt-4">R$ {selectedProduct.productprice}</p>
+        <p className="text-sm text-gray-600 mt-2">{selectedProduct.productcategory}</p>
         <div className="flex justify-end mt-4">
           <button
             onClick={onClose}

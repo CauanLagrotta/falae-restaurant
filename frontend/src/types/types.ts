@@ -1,20 +1,21 @@
 export interface Product {
   id: number;
-  name: string;
-  price: string;
-  description: string;
-  imageUrl: string;
-  category: string;
+  productname: string;
+  productprice: string;
+  productcategory: string;
+  productdescription: string;
+  productImageUrl: string;
 }
 
 export interface AddProductModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAddProduct: (product: {
-    name: string;
-    price: string;
-    category: string;
-    imageUrl: string;
+    productname: string;
+    productprice: string;
+    productcategory: string;
+    productdescription: string;
+    productImageUrl: string;
   }) => void;
 }
 
@@ -22,21 +23,24 @@ export interface EditProductModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAddProduct: (product: {
-    name: string;
-    price: string;
-    category: string;
-    imageUrl: string;
+    productname: string;
+    productprice: string;
+    productcategory: string;
+    productdescription: string;
+    productImageUrl: string;
   }) => void;
+
+  selectedProduct: Product | null;
 }
 
 export interface LearnMoreProps {
   isOpen: boolean;
   onClose: () => void;
   selectedProduct: {
-    name: string;
-    description: string;
-    price: string;
-    category: string;
+    productname: string;
+    productdescription: string;
+    productprice: string;
+    productcategory: string;
   };
 }
 
